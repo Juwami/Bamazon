@@ -1,1 +1,1 @@
-# Bamazon-Manager
+# Bamazon
