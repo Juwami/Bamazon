@@ -14,16 +14,20 @@ let connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    // showInventory();
-    makeAPurchase();
+    showInventory(function () {
+        makeAPurchase();
+    })
 })
 
-function showInventory() {
+function showInventory(callback) {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
+        console.log("----------------------------------------------------")
         for (i = 0; i < res.length; i++) {
-            console.log(`Item ID: ${res[i].item_id} | Product Name: ${res[i].product_name} | Department Name: ${res[i].department_name} | Price: ${res[i].price} | Stock Quantity: ${res[i].stock_quantity}`)
+            console.log("ItemID:" + res[i].item_id + " | Product Name: " + res[i].product_name + " | Department Name: " + res[i].department_name + " | Price: " + res[i].price + "| Stock Quantity: " + res[i].stock_quantity)
         }
+        console.log(("--------------------------------------------------"))
+        callback();
     })
 };
 
@@ -56,8 +60,9 @@ function makeAnotherPurchase() {
         }])
         .then(function (response) {
             if (response.choice === "Yes") {
-                showInventory();
+                showInventory(function () {
                 purchaseRequest();
+                });
             } else {
                 connection.end();
             }
@@ -74,7 +79,7 @@ function purchaseRequest() {
         .then(function (item) {
             connection.query("SELECT * FROM products WHERE item_id = " + connection.escape(item.itemID), function (err, res) {
                 if (err) throw err;
-                if (res) {
+                if (res != '') {
                     inquirer
                         .prompt([{
                             type: "number",
@@ -94,14 +99,13 @@ function purchaseRequest() {
                                     makeAnotherPurchase();
                                 } else {
                                     console.log("Insufficient stock. Try again later.")
-                                    showInventory();
-                                    makeAPurchase();
+                                    makeAnotherPurchase();
                                 }
                             })
                         })
                 } else {
                     console.log(`The item ID ${item.itemID} does not exist. Try again.`);
-                    makeAPurchase();
+                    makeAnotherPurchase();
                 }
             })
         })
