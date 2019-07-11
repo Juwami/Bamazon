@@ -90,7 +90,7 @@ function purchaseRequest() {
                                 if (amount.quantity < stock) {
                                     let newAmount = stock - amount.quantity
                                     connection.query("UPDATE products SET stock_quantity= " + connection.escape(newAmount) + " WHERE item_id = " + connection.escape(item.itemID))
-                                    console.log(`Thanks for purchasing! Your total is ${totalCost}`)
+                                    console.log(`Thanks for purchasing ${amount.quantity} ${res[0].product_name}s! Your total is $${totalCost}`)
                                     makeAnotherPurchase();
                                 } else {
                                     console.log("Insufficient stock. Try again later.")

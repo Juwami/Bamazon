@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS bamazon;
 CREATE DATABASE bamazon;
 USE bamazon;
 
@@ -28,7 +29,7 @@ INSERT INTO products (item_id, product_name, department_name, price, stock_quant
 VALUES (653, "No-Grain Purrfect", "Pet Supplies", 5.99, 214);
 
 INSERT INTO products (item_id, product_name, department_name, price, stock_quantity)
-VALUES (912, "Boze Headphones", "Headphones", 360.00, 360);
+VALUES (912, "Boze Headphone", "Headphones", 360.00, 360);
 
 INSERT INTO products (item_id, product_name, department_name, price, stock_quantity)
 VALUES (578, "HTML & CSS", "Books", 27.99, 80);
