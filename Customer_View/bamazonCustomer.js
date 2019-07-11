@@ -46,20 +46,63 @@ function makeAPurchase() {
         })
 }
 
+function makeAnotherPurchase() {
+    inquirer
+        .prompt([{
+            type: "list",
+            message: "Would you like to make another purchase?",
+            choices: ["Yes", "No"],
+            name: "choice"
+        }])
+        .then(function (response) {
+            if (response.choice === "Yes") {
+                showInventory();
+                purchaseRequest();
+            } else {
+                connection.end();
+            }
+        })
+}
+
 function purchaseRequest() {
     inquirer
         .prompt([{
-                type: "number",
-                message: "Please type in the ID of the item you would like to purchase",
-                name: "itemID"
-            },
-            {
-                type: "number",
-                mesasage: "How many would you like to purchase?",
-                name: "quantity"
-            }
-        ])
-        .then(function (response) {
-            console.log(response)
+            type: "number",
+            message: "Please type in the ID of the item you would like to purchase",
+            name: "itemID"
+        }])
+        .then(function (item) {
+            connection.query("SELECT * FROM products WHERE item_id = " + connection.escape(item.itemID), function (err, res) {
+                if (err) throw err;
+                if (res) {
+                    inquirer
+                        .prompt([{
+                            type: "number",
+                            message: "How many would you like to purchase?",
+                            name: "quantity"
+                        }])
+                        .then(function (amount) {
+                            connection.query("SELECT * FROM products WHERE item_id = " + connection.escape(item.itemID), function (err, res) {
+                                if (err) throw err;
+                                // console.log("Response:", res)
+                                let stock = res[0].stock_quantity
+                                let totalCost = (res[0].price * amount.quantity).toFixed(2)
+                                if (amount.quantity < stock) {
+                                    let newAmount = stock - amount.quantity
+                                    connection.query("UPDATE products SET stock_quantity= " + connection.escape(newAmount) + " WHERE item_id = " + connection.escape(item.itemID))
+                                    console.log(`Thanks for purchasing! Your total is ${totalCost}`)
+                                    makeAnotherPurchase();
+                                } else {
+                                    console.log("Insufficient stock. Try again later.")
+                                    showInventory();
+                                    makeAPurchase();
+                                }
+                            })
+                        })
+                } else {
+                    console.log(`The item ID ${item.itemID} does not exist. Try again.`);
+                    makeAPurchase();
+                }
+            })
         })
 }
