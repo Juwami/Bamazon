@@ -87,7 +87,7 @@ function lowInventory() {
 }
 
 function addInventoryPrompt() {
-    console.log("Add to Inventory")
+    // console.log("Add to Inventory")
     inquirer
         .prompt([{
             type: "number",
