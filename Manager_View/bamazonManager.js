@@ -43,8 +43,35 @@ function menu() {
         })
 }
 
+function returntoMenu() {
+    inquirer
+    .prompt([{
+        type: "list",
+        message: "Would you like to return to the menu?",
+        name: "option",
+        choices: ["Yes","No"]
+    }])
+    .then(function (res) {
+        if (res.option === "Yes") {
+            menu();
+        }
+        else {
+            connection.end();
+        }
+    })
+}
+
 function viewProducts() {
-    console.log("View Products for Sale")
+    // console.log("View Products for Sale")
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        console.log("----------------------------------------------------")
+        for (i = 0; i < res.length; i++) {
+            console.log("ItemID:" + res[i].item_id + " | Product Name: " + res[i].product_name + " | Department Name: " + res[i].department_name + " | Price: " + res[i].price + "| Stock Quantity: " + res[i].stock_quantity)
+        }
+        console.log(("--------------------------------------------------"))
+        returntoMenu();
+    })
 }
 
 function lowInventory() {
@@ -58,3 +85,8 @@ function addInventory() {
 function newProduct() {
     console.log("Add New Product")
 }
+
+// If a manager selects View Products for Sale, the app should list every available item: the item IDs, names, prices, and quantities.
+// If a manager selects View Low Inventory, then it should list all items with an inventory count lower than five.
+// If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently in the store.
+// If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
