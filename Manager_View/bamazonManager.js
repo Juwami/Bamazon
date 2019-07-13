@@ -34,7 +34,7 @@ function menu() {
                     lowInventory();
                     break;
                 case "Add to Inventory":
-                    addInventory();
+                    addInventoryPrompt();
                     break;
                 case "Add New Product":
                     newProduct();
@@ -75,7 +75,7 @@ function viewProducts() {
 
 function lowInventory() {
     console.log("View Low Inventory")
-    connection.query("SELECT * FROM bamazon.products WHERE stock_quantity < 5", function (err, res) {
+    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
         if (err) throw err;
         console.log("----------------------------------------------------")
         for (i = 0; i < res.length; i++) {
@@ -86,8 +86,44 @@ function lowInventory() {
     })
 }
 
-function addInventory() {
+function addInventoryPrompt() {
     console.log("Add to Inventory")
+    inquirer
+        .prompt([{
+            type: "number",
+            message: "Type the ID of the item you are adding to.",
+            name: "id"
+        }])
+        .then(function(res) {
+            connection.query("SELECT stock_quantity FROM products WHERE item_id = " + connection.escape(res.id), function(err, query) {
+                if (err) throw err;
+                if (query != "") {
+                    amountPrompt(res.id, query[0].stock_quantity);
+                }
+                else {
+                    console.log("The entered ID does not exist");
+                    returntoMenu();
+                }
+            })
+        })
+}
+
+function amountPrompt(itemID, stock) {
+    inquirer
+    .prompt([{
+        type: "number",
+        message: "How much is being added to inventory?",
+        name: "amount"
+    }])
+    .then(function (response) {
+        // console.log(stock)
+        // console.log(itemID)
+        // console.log(response.amount)
+        let newTotal = response.amount + stock;
+        connection.query("UPDATE products SET stock_quantity = " + connection.escape(newTotal) + " WHERE item_id = " + connection.escape(itemID))
+        console.log(`The new stock amount is ${newTotal}`);
+        returntoMenu();
+    })
 }
 
 function newProduct() {
@@ -95,6 +131,6 @@ function newProduct() {
 }
 
 
-// If a manager selects View Low Inventory, then it should list all items with an inventory count lower than five.
+
 // If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently in the store.
 // If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
