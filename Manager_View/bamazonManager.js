@@ -26,39 +26,38 @@ function menu() {
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
         }])
         .then(function (res) {
-            switch(res.option) {
+            switch (res.option) {
                 case "View Products for Sale":
-                viewProducts();
-                break;
+                    viewProducts();
+                    break;
                 case "View Low Inventory":
-                lowInventory();
-                break;
+                    lowInventory();
+                    break;
                 case "Add to Inventory":
-                addInventory();
-                break;
+                    addInventory();
+                    break;
                 case "Add New Product":
-                newProduct();
-                break;
+                    newProduct();
+                    break;
             }
         })
 }
 
 function returntoMenu() {
     inquirer
-    .prompt([{
-        type: "list",
-        message: "Would you like to return to the menu?",
-        name: "option",
-        choices: ["Yes","No"]
-    }])
-    .then(function (res) {
-        if (res.option === "Yes") {
-            menu();
-        }
-        else {
-            connection.end();
-        }
-    })
+        .prompt([{
+            type: "list",
+            message: "Would you like to return to the menu?",
+            name: "option",
+            choices: ["Yes", "No"]
+        }])
+        .then(function (res) {
+            if (res.option === "Yes") {
+                menu();
+            } else {
+                connection.end();
+            }
+        })
 }
 
 function viewProducts() {
@@ -76,7 +75,15 @@ function viewProducts() {
 
 function lowInventory() {
     console.log("View Low Inventory")
-    connection.query("SELECT * FROM bamazon.products WHERE stock_quantity < 5;")
+    connection.query("SELECT * FROM bamazon.products WHERE stock_quantity < 5", function (err, res) {
+        if (err) throw err;
+        console.log("----------------------------------------------------")
+        for (i = 0; i < res.length; i++) {
+            console.log("ItemID:" + res[i].item_id + " | Product Name: " + res[i].product_name + " | Department Name: " + res[i].department_name + " | Price: " + res[i].price + "| Stock Quantity: " + res[i].stock_quantity)
+        }
+        console.log("----------------------------------------------------")
+        returntoMenu();
+    })
 }
 
 function addInventory() {
