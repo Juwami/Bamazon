@@ -127,7 +127,33 @@ function amountPrompt(itemID, stock) {
 }
 
 function newProduct() {
-    console.log("Add New Product")
+    inquirer
+    .prompt([{
+        type: "number",
+        message: "What is the new item ID?",
+        name: "id"
+    }, {
+        type: "input",
+        message: "What is the new item name?",
+        name: "name"
+    }, {
+        type: "input",
+        message: "What is the department name?",
+        name: "department"
+    }, {
+        type: "number",
+        message: "What is the price for each item?",
+        name: "price"
+    }, {
+        type: "number",
+        message: "What is the initial stock amount?",
+        name: "stock"
+    }])
+    .then(function (response) {
+        connection.query("INSERT INTO products (item_id, product_name, department_name, price, stock_quantity) VALUES (" + connection.escape(response.id) + ',' + connection.escape(response.name) + "," + connection.escape(response.department) + "," + connection.escape(response.price) + "," + connection.escape(response.stock) + ")")
+        console.log("Product has been added successfully!")
+        returntoMenu();
+    })
 }
 
 // If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
