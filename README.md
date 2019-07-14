@@ -1,1 +1,3 @@
 # Bamazon
+
+Screenshots are located 
